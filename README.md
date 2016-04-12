@@ -71,13 +71,24 @@ Scripts for running the influenza reassortment detector
 
 **To run:**
 
-- Open up the scripts `clean_affmats_sh.py` and `compile_affmats_sh.py`, and rename the `handle` variable to your `$HANDLE`.
-- `$ python align_sh.py`
+- `$ python clean_affmats_sh.py $HANDLE`
 - `$ cd shell_scripts`
 - `$ qsub clean_affmats.sh`
 - `$ cd ..`
-- Wait until all of the jobs have been completed.
-- `$ python compile_affmats_sh.py`
+
+Wait until all of the jobs have been completed.
+
+Compute thresholds (if not pre-computed elsewhere)
+
+- `$ qlogin`
+- `$ cd /path/to/project/directory`
+- `$ python thresholds.py $HANDLE`
+- This step should take on the order of 30 minutes for a small dataset (~5000 isolates).
+- When done, exit the `qlogin` session: `$ exit`
+
+Compile the similarity matrices (affmats) together.
+
+- `$ python compile_affmats_sh.py $HANDLE`
 - `$ cd shell_scripts`
 - `$ qsub compile_affmats.sh`
 - `$ cd ..`
@@ -92,6 +103,7 @@ Scripts for running the influenza reassortment detector
 - Login to a compute node for interactive work, by running `$ qlogin`. For the complete set of IRD sequences, approximately 27GB of RAM should be required.
 - `$ cd path/to/project` (remember to change the directory path as appropriate)
 - `$ python full_affmat.py $HANDLE`
+- When done, exit out of the `qlogin` session: `$ exit`
 
 This step should take a few minutes. 
 
@@ -101,13 +113,14 @@ This step should take a few minutes.
 
 **To run:**
 
-- `$ python graph_initializer.py`
-- Open up the script `max_edge_finder.sh`, and edit your `$HANDLE`, and the `batch_size` variable. There is an art to determining the batch size, as a smaller batch size allows for faster runtimes per SGE job, but more jobs are required.
-- `$ python max_edge_finder_sh.py`
+- `$ python graph_initializer.py $HANDLE`
+- Open up the script `max_edge_finder.sh`, and edit the `batch_size` variable. There is an art to determining the batch size, as a smaller batch size allows for faster runtimes per SGE job, but more jobs are required.
+- `$ python max_edge_finder_sh.py $HANDLE`
 - `$ cd shell_scripts`
 - `$ qsub max_edge_finder.sh`
 - `$ cd ..`
 - Expect this step to take a long time (~1 day)
+- Also note that the final batch will return exit code 1, which is normal.
 
 ### Combine found edges into a condensed graph.
 
@@ -133,7 +146,10 @@ This step should take a few minutes.
 
 **To run:**
 
-- Open up the script `source_pair_sh.py` and change the `handle` variable to your `$HANDLE`.
+- Open up the script `source_pair_sh.py` and change:
+    - The number of compute slots and RAM requirement in the `get_header` function call.
+    - The number of isolates to process per batch.
+- Run the source pair finder: `$ python source_pair_sh.py $HANDLE`
 - `$ cd shell_scripts`
 - `$ qsub source_pair.sh`
 - `$ cd ..`
