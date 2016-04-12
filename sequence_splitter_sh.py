@@ -1,6 +1,11 @@
-handle = "20150902_all_ird"
+import sys
+import os
 
-header = '\
+if __name__ == '__main__':
+
+    handle = sys.argv[1]
+
+    header = '\
 #!/bin/sh \n\
 #$ -S /bin/sh \n\
 #$ -cwd \n\
@@ -11,28 +16,27 @@ header = '\
 #############################################\n \n\
 '
 
-import os
+    def check_dirs(dirname):
+        if dirname not in os.listdir(os.getcwd()):
+            os.mkdir(dirname)
+        else:
+            pass
 
-def check_dirs(dirname):
-	if dirname not in os.listdir(os.getcwd()):
-		os.mkdir(dirname)
-	else:
-		pass
+    check_dirs('shell_scripts')
+    check_dirs('split_fasta')
 
-check_dirs('shell_scripts')
-check_dirs('split_fasta')
+    for segment in range(1, 9):
+        with open('shell_scripts/sequence_splitter{0}.sh'.format(segment),
+                  'w') as f:
+            f.write(header)
 
+            f.write('cd ..\n')
 
-for segment in range(1,9):
-	with open('shell_scripts/sequence_splitter{0}.sh'.format(segment), 'w') as f:
-		f.write(header)
+            f.write('python sequence_splitter.py {0} {1}'
+                    .format(handle, segment))
 
-		f.write('cd ..\n')
+    with open('shell_scripts/sequence_splitter.sh', 'w') as f:
+        f.write(header)
 
-		f.write('python sequence_splitter.py {0} {1}'.format(handle, segment))
-
-with open('shell_scripts/sequence_splitter.sh', 'w') as f:
-	f.write(header)
-
-	for segment in range(1,9):
-		f.write('qsub sequence_splitter{0}.sh\n'.format(segment))
+        for segment in range(1, 9):
+            f.write('qsub sequence_splitter{0}.sh\n'.format(segment))
