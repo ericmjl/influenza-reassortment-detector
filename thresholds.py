@@ -13,7 +13,7 @@ def compute_threshold(affmat):
     ap = AffinityPropagation(affinity='precomputed')
     ap.fit(affmat)
 
-    clusters = pd.DataFrame(zip(affmat.index, ap.labels_))
+    clusters = pd.DataFrame([i for i in zip(affmat.index, ap.labels_)])
     clusters = clusters.set_index(0)
     clusters.columns = ['Cluster']
 
@@ -43,5 +43,5 @@ if __name__ == '__main__':
         tv = compute_threshold(affmat)
         threshold_values.append((segment, tv))
 
-    thresholds = pd.DataFrame(threshold_values)
+    thresholds = pd.DataFrame(threshold_values).set_index(1)
     thresholds.to_csv('thresholds.csv', header=None)
