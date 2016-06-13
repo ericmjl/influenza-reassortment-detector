@@ -28,7 +28,7 @@ Scripts for running the influenza reassortment detector
 
 **To run:** 
 
-- `$ python check_dir.py`
+- `$ python checkdir.py`
 
 ### Preprocess CSV file
 
